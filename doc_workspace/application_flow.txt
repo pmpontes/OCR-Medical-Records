@@ -1,0 +1,20 @@
+PPRO
+
+Data/Work Flow
+
+1. Provide image
+2. Make table cover the whole canvas
+	2.1. Detect corners of the table
+	2.2. Use OpenCV's affine transformation
+3. Extract table's cells
+	3.1. Detect limits of each cell
+	3.2. Export each cell as an image
+4. Apply OCR to each cell
+5. Introduce results in a matrix
+6. Display information/generate file
+
+
+Paradigm usage
+
+Object-oriented for the part of image processing and OCR
+...... for the visualisation part
