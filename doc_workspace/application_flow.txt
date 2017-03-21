@@ -3,6 +3,8 @@ PPRO
 Data/Work Flow
 
 1. Provide image
+
+/////////////////////////////////////////
 2. Make table cover the whole canvas
 	2.1. Detect corners of the table
 	2.2. Use OpenCV's affine transformation
@@ -11,6 +13,21 @@ Data/Work Flow
 	3.2. Export each cell as an image
 4. Apply OCR to each cell
 5. Introduce results in a matrix
+6. Display information/generate file
+
+/////////////////////////////////////////
+As outlined at http://answers.opencv.org/question/63847/how-to-extract-tables-from-an-image/
+
+2. Rotate image to ensure horizontal lines are at a 0º angle.
+3. Determine all points of the table.
+	3.1. Create binary image
+	3.2. Extract horizontal lines
+	3.3. Extract vertical lines
+	3.4. Create mask which includes the tables
+	3.5. Find the joints between the lines of the tables
+	3.6. Find external contours from the mask, which belong to tables
+4. Apply OCR to each cell
+5. Save results
 6. Display information/generate file
 
 
