@@ -137,9 +137,9 @@ public class ImgProcessor {
             if(joints_contours.size() <= 4)
                 continue;
 
-            rois.add(rsz(boundRect[i]).clone());
+            rois.add(rsz.(boundRect[i]).clone());
 
-            rectangle( rsz, boundRect[i].tl(), boundRect[i].br(), Scalar(0, 255, 0), 1, 8, 0 );
+            rectangle(processedImg, boundRect.get(i).tl(), boundRect.get(i).br(), new Scalar(0, 255, 0), 1, 8, 0 );
         }
 
         for(int i = 0; i < rois.size(); ++i) {
