@@ -1,14 +1,14 @@
 # OCR-Medical-Records
 
-##Summary
+## Summary
 
 Developed for a Programming Paradigms course.
 
-##Getting Started
+## Getting Started
 
-###Pre-requisites
+### Pre-requisites
 
-OpenCV.
+* OpenCV;
 
 
-###Usage
+### Usage
