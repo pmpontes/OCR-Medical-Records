@@ -103,15 +103,15 @@ public class ImgProcessor {
         add(horizontal, vertical, mask);
 
         // find the joints between the lines of the tables, we will use this information in order to discriminate tables from pictures (tables will contain more than 4 joints while a picture only 4 (i.e. at the corners))
-        Mat joints = new Mat();
-        bitwise_and(horizontal, vertical, joints);
+        Mat jointPoints = new Mat();
+        bitwise_and(horizontal, vertical, jointPoints);
 
         ///////////TODO test everything from here on
         Mat hierarchy = new Mat();
         List<MatOfPoint> contours = new ArrayList<>();
         findContours(mask, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, new Point(0, 0));
 
-        List<List<Point>> contours_poly = new ArrayList<>(contours.size());
+        List<MatOfPoint2f> contours_poly = new ArrayList<>(contours.size());
         List<Rect> boundRect = new ArrayList<>(contours.size());
         List<Mat> rois = new ArrayList<>();
 
@@ -124,34 +124,31 @@ public class ImgProcessor {
             if(area < 100) // value is randomly chosen, you will need to find that by yourself with trial and error procedure
                 continue;
 
-            approxPolyDP(new MatOfPoint2f(contours.get(i)), new MatOfPoint2f(contours_poly.get(i).toArray()), 3.0, true);
-            boundRect.set(i, boundingRect(new Mat(contours_poly[i])));
+            approxPolyDP(new MatOfPoint2f(contours.get(i)), contours_poly.get(i), 3.0, true);
+            boundRect.set(i, boundingRect(new MatOfPoint(contours_poly.get(i))));
 
             // find the number of joints that each table has
-            Mat roi = joints(boundRect[i]);
+            Mat roi = joints(boundRect.get(i));
 
-            vector<vector<Point> > joints_contours;
+            List<MatOfPoint> joints_contours = new ArrayList<>();
             findContours(roi, joints_contours, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
 
             // if the number is not more than 5 then most likely it not a table
             if(joints_contours.size() <= 4)
                 continue;
 
-            rois.push_back(rsz(boundRect[i]).clone());
+            rois.add(rsz(boundRect[i]).clone());
 
-//        drawContours( rsz, contours, i, Scalar(0, 0, 255), CV_FILLED, 8, vector<Vec4i>(), 0, Point() );
             rectangle( rsz, boundRect[i].tl(), boundRect[i].br(), Scalar(0, 255, 0), 1, 8, 0 );
         }
 
-        for(size_t i = 0; i < rois.size(); ++i)
-        {
+        for(int i = 0; i < rois.size(); ++i) {
         /* Now you can do whatever post process you want
          * with the data within the rectangles/tables. */
-            imshow("roi", rois[i]);
-            waitKey();
+           // imshow("roi", rois[i]);
         }
 
-        return joints;
+        return jointPoints;
     }
 
 
