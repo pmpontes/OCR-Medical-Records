@@ -9,6 +9,7 @@ Developed for a Programming Paradigms course.
 ### Pre-requisites
 
 * OpenCV;
+  https://medium.com/@aadimator/how-to-set-up-opencv-in-intellij-idea-6eb103c1d45c#.zgiti633e
 
 
 ### Usage
