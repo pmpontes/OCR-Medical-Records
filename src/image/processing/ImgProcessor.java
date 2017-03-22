@@ -4,6 +4,7 @@ import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import tools.Log;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,24 +16,24 @@ import static org.opencv.imgproc.Imgproc.*;
 
 public class ImgProcessor {
 
-    private String fileName = "table.jpg";
     private Mat originalImg = null;
     private Mat processedImg = new Mat();
 
     public ImgProcessor(String fileName) {
         // Load originalImg image
-        this.fileName = fileName;
         originalImg = imread(fileName);
 
         // TODO check if the test condition is valid (different from c++ implementation)
         // Check if image is loaded fine
-        if(originalImg.empty()){
+        /*if(originalImg.empty()){
             Log.error("Error loading image.");
-        }
+        }*/
 
         // TODO check if necessary
         // resizing for practical reasons
         resize(originalImg, processedImg, new Size(800, 900));
+
+        //Log.showResult(processedImg.clone());
     }
 
     private void createBinaryImage(){
@@ -40,26 +41,27 @@ public class ImgProcessor {
         Mat gray = new Mat();
 
         if (processedImg.channels() == 3) {
-            cvtColor(processedImg, gray, Imgproc.COLOR_BGR2GRAY);
+            cvtColor(processedImg, gray, COLOR_BGR2GRAY);
         }
         else {
-            gray = processedImg;
+            gray = processedImg.clone();
         }
 
         // Apply adaptiveThreshold at the bitwise_not of gray (btwn)
         Mat btwn = new Mat(), bw = new Mat();
         bitwise_not(gray, btwn);
-        adaptiveThreshold(bw, btwn, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 15, -2);
+        adaptiveThreshold(btwn, bw, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 15, -2);
 
-        processedImg = bw;
+        processedImg = bw.clone();
     }
 
     private Mat exctractHorizontalLines(){
         // Create the image that will use to extract the horizontal lines
         Mat horizontal = processedImg.clone();
+        Log.showResult(processedImg.clone());
 
         // TODO
-        int scale = 15; // play with this variable in order to increase/decrease the amount of lines to be detected
+        int scale = 2; // play with this variable in order to increase/decrease the amount of lines to be detected
 
         // Specify size on horizontal axis
         int horizontalsize = horizontal.cols() / scale;
@@ -68,9 +70,10 @@ public class ImgProcessor {
         Mat horizontalStructure = getStructuringElement(MORPH_RECT, new Size(horizontalsize,1));
 
         // Apply morphology operations
-        erode(horizontal, horizontal, horizontalStructure, new Point(-1, -1), 100); // TODO check iteration number
-        dilate(horizontal, horizontal, horizontalStructure, new Point(-1, -1), 100);
+        erode(horizontal.clone(), horizontal, horizontalStructure, new Point(-1, -1), 500); // TODO check iteration number
+        dilate(horizontal.clone(), horizontal, horizontalStructure, new Point(-1, -1), 100);
 
+        Log.showResult(horizontal.clone());
         return horizontal;
     }
 
@@ -94,7 +97,9 @@ public class ImgProcessor {
         return vertical;
     }
 
-    public Mat findCountours() {
+    public Mat findContours() {
+        createBinaryImage();
+
         Mat horizontal = exctractHorizontalLines();
         Mat vertical = extractVerticalLines();
 
@@ -102,6 +107,8 @@ public class ImgProcessor {
         Mat mask = new Mat();
         add(horizontal, vertical, mask);
 
+        Log.showResult(mask);
+/*
         // find the joints between the lines of the tables, we will use this information in order to discriminate tables from pictures (tables will contain more than 4 joints while a picture only 4 (i.e. at the corners))
         Mat jointPoints = new Mat();
         bitwise_and(horizontal, vertical, jointPoints);
@@ -128,16 +135,16 @@ public class ImgProcessor {
             boundRect.set(i, boundingRect(new MatOfPoint(contours_poly.get(i))));
 
             // find the number of joints that each table has
-            Mat roi = joints(boundRect.get(i));
+           // Mat roi = joints(boundRect.get(i));
 
             List<MatOfPoint> joints_contours = new ArrayList<>();
-            findContours(roi, joints_contours, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
+            //findContours(roi, joints_contours, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
 
             // if the number is not more than 5 then most likely it not a table
             if(joints_contours.size() <= 4)
                 continue;
 
-            rois.add(rsz.(boundRect[i]).clone());
+            //rois.add(rsz.(boundRect[i]).clone());
 
             rectangle(processedImg, boundRect.get(i).tl(), boundRect.get(i).br(), new Scalar(0, 255, 0), 1, 8, 0 );
         }
@@ -146,12 +153,9 @@ public class ImgProcessor {
         /* Now you can do whatever post process you want
          * with the data within the rectangles/tables. */
            // imshow("roi", rois[i]);
-        }
-
-        return jointPoints;
+        //}
+        return null;
+        //return jointPoints;
     }
-
-
-
 
 }
