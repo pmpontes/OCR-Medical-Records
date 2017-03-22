@@ -58,10 +58,9 @@ public class ImgProcessor {
     private Mat exctractHorizontalLines(){
         // Create the image that will use to extract the horizontal lines
         Mat horizontal = processedImg.clone();
-        Log.showResult(processedImg.clone());
 
         // TODO
-        int scale = 2; // play with this variable in order to increase/decrease the amount of lines to be detected
+        int scale = 15; // play with this variable in order to increase/decrease the amount of lines to be detected
 
         // Specify size on horizontal axis
         int horizontalsize = horizontal.cols() / scale;
@@ -70,10 +69,11 @@ public class ImgProcessor {
         Mat horizontalStructure = getStructuringElement(MORPH_RECT, new Size(horizontalsize,1));
 
         // Apply morphology operations
-        erode(horizontal.clone(), horizontal, horizontalStructure, new Point(-1, -1), 500); // TODO check iteration number
-        dilate(horizontal.clone(), horizontal, horizontalStructure, new Point(-1, -1), 100);
+        erode(horizontal.clone(), horizontal, horizontalStructure);
+        dilate(horizontal.clone(), horizontal, horizontalStructure);
+        //erode(vertical, vertical, verticalStructure, new Point(-1, -1), 100); // TODO check if the Point is reall not necessary
+        //dilate(vertical, vertical, verticalStructure, new Point(-1, -1), 100);
 
-        Log.showResult(horizontal.clone());
         return horizontal;
     }
 
@@ -91,8 +91,8 @@ public class ImgProcessor {
         Mat verticalStructure = getStructuringElement(MORPH_RECT, new Size( 1,verticalsize));
 
         // Apply morphology operations
-        erode(vertical, vertical, verticalStructure, new Point(-1, -1), 100); // TODO check iteration number
-        dilate(vertical, vertical, verticalStructure, new Point(-1, -1), 100);
+        erode(vertical, vertical, verticalStructure);
+        dilate(vertical, vertical, verticalStructure);
 
         return vertical;
     }
