@@ -50,7 +50,9 @@ public class ImgProcessor {
         // Apply adaptiveThreshold at the bitwise_not of gray (btwn)
         Mat btwn = new Mat(), bw = new Mat();
         bitwise_not(gray, btwn);
-        adaptiveThreshold(btwn, bw, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 15, -2);
+
+        // Block size 103 works well with the example provided, but may be overtrained
+        adaptiveThreshold(btwn, bw, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 103, -2);
 
         processedImg = bw.clone();
     }
@@ -59,8 +61,8 @@ public class ImgProcessor {
         // Create the image that will use to extract the horizontal lines
         Mat horizontal = processedImg.clone();
 
-        // TODO
-        int scale = 15; // play with this variable in order to increase/decrease the amount of lines to be detected
+        // This value works well with the example provided
+        int scale = 3; // play with this variable in order to increase/decrease the amount of lines to be detected
 
         // Specify size on horizontal axis
         int horizontalsize = horizontal.cols() / scale;
@@ -81,8 +83,8 @@ public class ImgProcessor {
         // Create the image that will use to extract the horizontal lines
         Mat vertical = processedImg.clone();
 
-        // TODO
-        int scale = 15; // play with this variable in order to increase/decrease the amount of lines to be detected
+        // This value works well with the example provided
+        int scale = 3; // play with this variable in order to increase/decrease the amount of lines to be detected
 
         // Specify size on vertical axis
         int verticalsize = vertical.rows() / scale;
@@ -97,6 +99,10 @@ public class ImgProcessor {
         return vertical;
     }
 
+    private List<Point> extractCellEdges(Mat horizontal, Mat vertical) {
+        return null;
+    }
+
     public Mat findContours() {
         createBinaryImage();
 
@@ -107,20 +113,24 @@ public class ImgProcessor {
         Mat mask = new Mat();
         add(horizontal, vertical, mask);
 
-        Log.showResult(mask);
-/*
+        //Log.showResult(processedImg);
+        //Log.showResult(mask);
+
         // find the joints between the lines of the tables, we will use this information in order to discriminate tables from pictures (tables will contain more than 4 joints while a picture only 4 (i.e. at the corners))
         Mat jointPoints = new Mat();
         bitwise_and(horizontal, vertical, jointPoints);
 
+        //Log.showResult(jointPoints);
+
         ///////////TODO test everything from here on
         Mat hierarchy = new Mat();
         List<MatOfPoint> contours = new ArrayList<>();
-        findContours(mask, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, new Point(0, 0));
+        Imgproc.findContours(mask, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, new Point(0, 0));
 
-        List<MatOfPoint2f> contours_poly = new ArrayList<>(contours.size());
         List<Rect> boundRect = new ArrayList<>(contours.size());
         List<Mat> rois = new ArrayList<>();
+
+        System.out.println(contours.size());
 
         for (int i = 0; i < contours.size(); i++)
         {
@@ -131,11 +141,15 @@ public class ImgProcessor {
             if(area < 100) // value is randomly chosen, you will need to find that by yourself with trial and error procedure
                 continue;
 
-            approxPolyDP(new MatOfPoint2f(contours.get(i)), contours_poly.get(i), 3.0, true);
-            boundRect.set(i, boundingRect(new MatOfPoint(contours_poly.get(i))));
+            MatOfPoint2f origin_contour = new MatOfPoint2f();
+            MatOfPoint2f destination_contour = new MatOfPoint2f();
+            contours.get(i).convertTo(origin_contour, CvType.CV_32S);
+            contours.get(i).convertTo(destination_contour, CvType.CV_32S);
+            approxPolyDP(origin_contour, destination_contour, 3.0, true);
+            boundRect.set(i, boundingRect(new MatOfPoint(destination_contour)));
 
             // find the number of joints that each table has
-           // Mat roi = joints(boundRect.get(i));
+            //Mat roi = joints(boundRect.get(i));
 
             List<MatOfPoint> joints_contours = new ArrayList<>();
             //findContours(roi, joints_contours, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
@@ -149,11 +163,13 @@ public class ImgProcessor {
             rectangle(processedImg, boundRect.get(i).tl(), boundRect.get(i).br(), new Scalar(0, 255, 0), 1, 8, 0 );
         }
 
-        for(int i = 0; i < rois.size(); ++i) {
-        /* Now you can do whatever post process you want
-         * with the data within the rectangles/tables. */
+        //Log.showResult(processedImg);
+
+        /*for(int i = 0; i < rois.size(); ++i) {
+        // Now you can do whatever post process you want
+        // with the data within the rectangles/tables.
            // imshow("roi", rois[i]);
-        //}
+        }*/
         return null;
         //return jointPoints;
     }

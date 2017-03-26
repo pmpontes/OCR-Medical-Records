@@ -12,7 +12,7 @@ public class Main {
             return;
         }*/
 
-        ImgProcessor img = new ImgProcessor("table.jpg"); // for test purposes
+        ImgProcessor img = new ImgProcessor("test files/table2.jpg"); // for test purposes
         img.findContours();
     }
 }
