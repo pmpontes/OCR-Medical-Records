@@ -12,7 +12,7 @@ public class ImageRecognitionHandler {
     private ImageRecognitionHandler(){
         tessInst = new Tesseract();
         tessInst.setDatapath("tess\\tessdata");
-        tessInst.setTessVariable("tessedit_char_whitelist", "0123456789-.,/"); // reset the character set accepted
+        tessInst.setTessVariable("tessedit_char_whitelist", "AM0123456789-.,/"); // reset the character set accepted
     }
 
     public static ImageRecognitionHandler getInstance(){
