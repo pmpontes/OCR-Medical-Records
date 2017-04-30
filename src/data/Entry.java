@@ -2,10 +2,6 @@ package data;
 
 import org.json.simple.JSONObject;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement(name = "entry")
 public class Entry {
     private String date;
     private String age;
@@ -16,26 +12,6 @@ public class Entry {
         this.date = date;
         this.age = age;
         this.weight = weight;
-        this.cephalicPerimeter = cephalicPerimeter;
-    }
-
-    @XmlElement
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    @XmlElement
-    public void setAge(String age) {
-        this.age = age;
-    }
-
-    @XmlElement
-    public void setWeight(float weight) {
-        this.weight = weight;
-    }
-
-    @XmlElement
-    public void setCephalicPerimeter(float cephalicPerimeter) {
         this.cephalicPerimeter = cephalicPerimeter;
     }
 

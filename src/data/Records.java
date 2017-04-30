@@ -3,12 +3,8 @@ package data;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import java.util.ArrayList;
 
-@XmlRootElement(name = "records")
 public class Records {
     private String patientName;
     private ArrayList<Entry> recordTable;
@@ -20,16 +16,6 @@ public class Records {
     public Records(String patientName){
         this.patientName = patientName;
         recordTable = new ArrayList<>();
-    }
-
-    @XmlElement
-    public void setPatientName(String patientName) {
-        this.patientName = patientName;
-    }
-
-    @XmlElement
-    public void setRecordTable(ArrayList<Entry> recordTable) {
-        this.recordTable = recordTable;
     }
 
     public boolean addRecordEntry(Entry newEntry){
