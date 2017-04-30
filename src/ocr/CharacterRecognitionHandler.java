@@ -14,7 +14,13 @@ public class CharacterRecognitionHandler {
     private CharacterRecognitionHandler(){
         tessInst = new Tesseract();
         tessInst.setDatapath("tess\\tessdata");
-        tessInst.setTessVariable("tessedit_char_whitelist", "AM0123456789-.,/"); // reset the character set accepted
+
+        // disable dictionaries
+        tessInst.setTessVariable("load_freq_dawg", "false");
+        tessInst.setTessVariable("load_system_dawg", "false");
+
+        // reset the character set accepted
+        tessInst.setTessVariable("tessedit_char_whitelist", "AM0123456789-.,/");
 
         handlerInst = this;
     }
