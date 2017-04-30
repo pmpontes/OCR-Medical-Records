@@ -4,6 +4,7 @@ import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import tools.Log;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -158,4 +159,8 @@ public class ImgProcessor {
         //return jointPoints;
     }
 
+    // TODO
+    public ArrayList<Rectangle> divideTableIntoCells() {
+        return null;
+    }
 }
