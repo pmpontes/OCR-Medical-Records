@@ -102,11 +102,19 @@
                     <hr class="section-heading-spacer">
                     <div class="clearfix"></div>
                     <h2 class="section-heading">Upload your image</h2>
-                    <input type="file" class="file" data-show-preview="true">
-                    <button class="btn btn-default btn-lg centered">Upload</button>
+                    <div class="text-center">
+                      <div>
+                        <input id="uploadFile" placeholder="Choose File" disabled="disabled" />
+                        <div class="fileUpload btn btn-default block">
+                          <span>Browse</span>
+                          <input id="uploadBtn" type="file" class="upload" />
+                        </div>
+                      </div>
+                      <button id="uploadClick" type="button" class="btn btn-default btn-lg">Start</button>
+                    </div>
                 </div>
                 <div class="col-lg-5 col-lg-offset-2 col-sm-6">
-                    <img class="img-responsive" src="img/ipad.png" alt="">
+                    <img id="img1Click" class="img-responsive" src="img/ipad.png" alt="">
                 </div>
             </div>
 
@@ -121,14 +129,17 @@
         <div class="container">
 
             <div class="row">
-                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6 col-sm-6">
                     <hr class="section-heading-spacer">
                     <div class="clearfix"></div>
-                    <h2 class="section-heading">3D Device Mockups<br>by PSDCovers</h2>
-                    <p class="lead">Turn your 2D designs into high quality, 3D product shots in seconds using free Photoshop actions by <a target="_blank" href="http://www.psdcovers.com/">PSDCovers</a>! Visit their website to download some of their awesome, free photoshop actions!</p>
+                    <h2 class="section-heading">OCR image</h2>
+                    <div class="text-center">
+                      <i id="icon1Click" class="fa fa-times fa-5x" aria-hidden="true"></i>
+                      <p id="msg1Click" class="lead">Waiting image...</p>
+                    </div>
                 </div>
                 <div class="col-lg-5 col-sm-pull-6  col-sm-6">
-                    <img class="img-responsive" src="img/dog.png" alt="">
+                    <img id="img2Click" class="img-responsive" src="img/dog.png" alt="">
                 </div>
             </div>
 
@@ -137,6 +148,30 @@
 
     </div>
     <!-- /.content-section-b -->
+
+    <div class="content-section-c">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Data chart</h2>
+                    <div class="text-center">
+                      <i id="icon2Click" class="fa fa-times fa-5x" aria-hidden="true"></i>
+                      <p id="msg2Click" class="lead">Waiting image...</p>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                    <img id="img3Click" class="img-responsive" src="img/ipad.png" alt="">
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-c -->
 
 	<a  name="contact"></a>
     <div class="banner">
@@ -204,6 +239,9 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/javascript.js"></script>
 
 </body>
 
