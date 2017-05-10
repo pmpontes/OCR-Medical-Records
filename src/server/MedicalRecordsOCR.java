@@ -51,12 +51,15 @@ public class MedicalRecordsOCR {
                 float weight = Float.parseFloat(cellText);
 
                 cellText = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
+                float height = Float.parseFloat(cellText);
+
+                cellText = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
                 float cephalicPerimeter = Float.parseFloat(cellText);
 
-                patientRecords.addRecordEntry(new Entry(date, age, weight, cephalicPerimeter));
+                patientRecords.addRecordEntry(new Entry(date, age, weight, height, cephalicPerimeter));
             } catch (Exception e) {
-                e.printStackTrace();
                 Log.error("An error occurred while analysing the file.");
+                e.printStackTrace();
             }
         }
 
