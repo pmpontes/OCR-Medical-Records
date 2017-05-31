@@ -4,12 +4,11 @@ import data.Entry;
 import data.Records;
 import image.processing.ImgProcessor;
 import ocr.CharacterRecognitionHandler;
+import org.json.simple.JSONObject;
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
 import tools.Log;
 
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -32,8 +31,7 @@ public class MedicalRecordsOCR {
         }
     }
 
-    public String process() {
-        /*
+    public JSONObject process() {
         ImgProcessor imgProcessor = new ImgProcessor(filePath);
         ArrayList<Rectangle> cells = imgProcessor.divideTableIntoCells();
 
@@ -67,9 +65,6 @@ public class MedicalRecordsOCR {
             }
         }
 
-        Log.detail(patientRecords.toString());
-        return patientRecords;*/
-        Log.error(filePath);
-        return filePath;
+        return patientRecords.toJSON();
     }
 }

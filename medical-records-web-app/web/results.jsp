@@ -29,11 +29,24 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <script src="js/raphael.min.js"></script>
+    <script src="js/morris.js"></script>
+
+    <script src="js/javascript.js"></script>
+
 </head>
 
 <body>
     <script>
-        const results = '<%= (new MedicalRecordsOCR(request.getParameter("file_name"))).process() %>';
+        const FILES_LOCATION = "G:\\Documents\\GitHub\\OCR-Medical-Records\\test files\\";
+        const fileLocation = FILES_LOCATION + '<%= request.getParameter("file_name") %>';
+        const results = JSON.parse('<%= (new MedicalRecordsOCR(request.getParameter("file_name"))).process() %>');
         console.log(results);
     </script>
     <!-- Navigation -->
@@ -98,153 +111,40 @@
     <!-- Page Content -->
 
 	<a  name="services"></a>
-    <div class="content-section-a">
-
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-5 col-sm-6">
-                    <hr class="section-heading-spacer">
-                    <div class="clearfix"></div>
-                    <h2 class="section-heading">Upload your image</h2>
-                    <div class="text-center">
-                      <div>
-                        <input id="uploadFile" placeholder="Choose File" disabled="disabled" />
-                        <div class="fileUpload btn btn-default block">
-                          <span>Browse</span>
-                          <img id="selectedFile" src="" style="display:none;" />
-                          <input id="uploadBtn" onchange="readURL(this);" type="file" class="upload" />
-                        </div>
-                      </div>
-                      <button id="uploadClick" type="button" class="btn btn-default btn-lg">Start</button>
-                    </div>
-                </div>
-                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
-                    <img id="img1Click" class="img-responsive" src="img/ipad.png" alt="">
-                </div>
-            </div>
-
-        </div>
-        <!-- /.container -->
-
-    </div>
-    <!-- /.content-section-a -->
 
     <div class="content-section-b">
 
-        <div class="container">
+            <div class="container">
 
-            <div class="row">
-                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6 col-sm-6">
-                    <hr class="section-heading-spacer">
-                    <div class="clearfix"></div>
-                    <h2 class="section-heading">Table</h2>
-                    <div class="text-center">
-                      <i id="icon1Click" class="fa fa-times fa-5x" aria-hidden="true"></i>
-                      <p id="msg1Click" class="lead">Waiting image...</p>
+                <div class="row">
+                    <div class="col-lg-5 col-lg-offset-1 col-sm-push-6 col-sm-6">
+                        <hr class="section-heading-spacer">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">Table</h2>
+                        <div id="imgDiv" class="text-center">
+                        </div>
+                    </div>
+                    <div id="tableClick" class="col-lg-5 col-sm-pull-6  col-sm-6">
+                      <table class="table table-bordered">
+                      </table>
                     </div>
                 </div>
-                <div id="tableClick" class="col-lg-5 col-sm-pull-6  col-sm-6">
-                  <table class="table table-bordered">
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Idade</th>
-                        <th>Peso</th>
-                        <th>Estat.</th>
-                        <th>P. Cef</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                    <!--<img id="img2Click" class="img-responsive" src="img/dog.png" alt="">-->
-                </div>
+
             </div>
+            <!-- /.container -->
 
         </div>
-        <!-- /.container -->
+        <!-- /.content-section-b -->
 
-    </div>
-    <!-- /.content-section-b -->
-
-    <div class="content-section-c">
-
+  <!--<div class="content-section-c">
         <div class="container">
             <div class="row">
                 <div class="col-lg-5 col-sm-6">
                     <hr class="section-heading-spacer">
                     <div class="clearfix"></div>
                     <h2 class="section-heading">Data chart</h2>
-                    <div class="text-center">
-                      <i id="icon2Click" class="fa fa-times fa-5x" aria-hidden="true"></i>
-                      <p id="msg2Click" class="lead">Waiting image...</p>
-                    </div>
                 </div>
                 <div class="col-lg-5 col-lg-offset-2 col-sm-6">
-                    <!--<img id="img3Click" class="img-responsive" src="img/ipad.png" alt="">-->
                     <div id="myfirstchart"></div>
                 </div>
             </div>
@@ -315,19 +215,6 @@
             </div>
         </div>
     </footer>
-
-    <!-- jQuery -->
-    <script src="js/jquery.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
-
-    <script src="js/raphael.min.js"></script>
-    <script src="js/morris.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="js/javascript.js"></script>
-
 </body>
 
 <!-- Modal -->
