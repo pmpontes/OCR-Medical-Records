@@ -5,7 +5,9 @@ import org.opencv.imgproc.Imgproc;
 import tools.Log;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.opencv.core.Core.add;
@@ -13,8 +15,12 @@ import static org.opencv.core.Core.bitwise_and;
 import static org.opencv.core.Core.bitwise_not;
 import static org.opencv.imgcodecs.Imgcodecs.*;
 import static org.opencv.imgproc.Imgproc.*;
+import static org.opencv.core.Point.*;
+import static org.opencv.core.CvType.*;
 
 public class ImgProcessor {
+
+    private static final int VERTEX_MINIMUM_DISTANCE = 4;
 
     private Mat originalImg = null;
     private Mat processedImg = new Mat();
@@ -52,7 +58,7 @@ public class ImgProcessor {
         bitwise_not(gray, btwn);
 
         // Block size 103 works well with the example provided, but may be overtrained
-        adaptiveThreshold(btwn, bw, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 103, -2);
+        adaptiveThreshold(btwn, bw, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 101, -2);
 
         processedImg = bw.clone();
     }
@@ -113,14 +119,19 @@ public class ImgProcessor {
         Mat mask = new Mat();
         add(horizontal, vertical, mask);
 
-        //Log.showResult(processedImg);
-        //Log.showResult(mask);
+        Log.showResult(processedImg);
+        Log.showResult(mask);
+
+        Mat houghLines = new Mat();
+        HoughLinesP(mask, houghLines, 1, Math.PI/180, 80, 100, 100);
+
+        Log.showResult(houghLines);
 
         // find the joints between the lines of the tables, we will use this information in order to discriminate tables from pictures (tables will contain more than 4 joints while a picture only 4 (i.e. at the corners))
         Mat jointPoints = new Mat();
         bitwise_and(horizontal, vertical, jointPoints);
-
-        //Log.showResult(jointPoints);
+/*
+        Log.showResult(jointPoints);
 
         ///////////TODO test everything from here on
         Mat hierarchy = new Mat();
@@ -130,6 +141,9 @@ public class ImgProcessor {
         List<Rect> boundRect = new ArrayList<>(contours.size());
         List<Mat> rois = new ArrayList<>();
 
+        processVertexes(jointPoints);
+
+        /*
         System.out.println(contours.size());
 
         for (int i = 0; i < contours.size(); i++)
@@ -172,6 +186,103 @@ public class ImgProcessor {
         }*/
         return null;
         //return jointPoints;
+    }
+
+    public ArrayList<ArrayList<Point>> processVertexes(Mat original) {
+        boolean foundVertex = false;
+        int currDistanceX = 0;
+        int currDistanceY = 0;
+        int colNum = 0;
+        int rowNum = 0;
+
+        Mat topLeft = new Mat();
+        Mat topRight = new Mat();
+        Mat bottomLeft = new Mat();
+        Mat bottomRight = new Mat();
+
+        Imgproc.filter2D(original, topRight,    -1, kernelGenerator(1));
+        Imgproc.filter2D(original, topLeft,     -1, kernelGenerator(2));
+        Imgproc.filter2D(original, bottomLeft,  -1, kernelGenerator(3));
+        Imgproc.filter2D(original, bottomRight, -1, kernelGenerator(4));
+
+        Log.showResult(topRight);
+        Log.showResult(bottomLeft);
+        Log.showResult(topLeft);
+        Log.showResult(bottomRight);
+
+        int threshold = 1;
+
+        ArrayList<Point> topRightCorners = highPassFilter(topRight, threshold);
+        ArrayList<Point> topLeftCorners = highPassFilter(topLeft, threshold);
+        ArrayList<Point> bottomRightCorners = highPassFilter(bottomLeft, threshold);
+        ArrayList<Point> bottomLeftCorners = highPassFilter(bottomRight, threshold);
+
+        return null;
+    }
+
+    private Mat kernelGenerator(int quadrant) {
+        Mat result = new Mat(3, 3, CV_32F);
+        int negativeWeight = -10;
+        int positiveWeight = 0;
+
+        result.put(1,1,3);
+        switch(quadrant) {
+            case 1:
+                result.put(0,0,negativeWeight);
+                result.put(0,1,negativeWeight);
+                result.put(0,2,negativeWeight);
+                result.put(1,2,negativeWeight);
+                result.put(2,2,negativeWeight);
+                result.put(1,0,positiveWeight);
+                result.put(2,0,positiveWeight);
+                result.put(2,1,positiveWeight);
+                break;
+            case 2:
+                result.put(0,0,negativeWeight);
+                result.put(0,1,negativeWeight);
+                result.put(0,2,negativeWeight);
+                result.put(1,0,negativeWeight);
+                result.put(2,0,negativeWeight);
+                result.put(1,2,positiveWeight);
+                result.put(2,1,positiveWeight);
+                result.put(2,2,positiveWeight);
+                break;
+            case 3:
+                result.put(2,0,negativeWeight);
+                result.put(2,1,negativeWeight);
+                result.put(2,2,negativeWeight);
+                result.put(0,0,negativeWeight);
+                result.put(1,0,negativeWeight);
+                result.put(1,2,positiveWeight);
+                result.put(0,1,positiveWeight);
+                result.put(0,2,positiveWeight);
+                break;
+            case 4:
+                result.put(2,1,negativeWeight);
+                result.put(2,0,negativeWeight);
+                result.put(0,2,negativeWeight);
+                result.put(1,2,negativeWeight);
+                result.put(2,2,negativeWeight);
+                result.put(0,0,positiveWeight);
+                result.put(0,1,positiveWeight);
+                result.put(1,0,positiveWeight);
+                break;
+            default:
+                break;
+
+        }
+
+        return result;
+    }
+
+    private ArrayList<Point> highPassFilter(Mat image, int threshold) {
+        ArrayList<Point> result = new ArrayList<>();
+
+        for(int y = 0; y < image.rows(); y++)
+            for(int x = 0; x < image.cols(); x++)
+                if(image.get(y, x)[0] > threshold) result.add(new Point(x, y));
+
+        return result;
     }
 
 }
