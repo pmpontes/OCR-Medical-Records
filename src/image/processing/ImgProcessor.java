@@ -6,9 +6,8 @@ import tools.Log;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.opencv.core.Core.add;
 import static org.opencv.core.Core.bitwise_and;
@@ -122,17 +121,15 @@ public class ImgProcessor {
         Log.showResult(processedImg);
         Log.showResult(mask);
 
-        Mat houghLines = new Mat();
-        HoughLinesP(mask, houghLines, 1, Math.PI/180, 80, 100, 100);
-
-        Log.showResult(houghLines);
-
         // find the joints between the lines of the tables, we will use this information in order to discriminate tables from pictures (tables will contain more than 4 joints while a picture only 4 (i.e. at the corners))
         Mat jointPoints = new Mat();
         bitwise_and(horizontal, vertical, jointPoints);
-/*
+
         Log.showResult(jointPoints);
 
+        processVertexes(jointPoints);
+
+/*
         ///////////TODO test everything from here on
         Mat hierarchy = new Mat();
         List<MatOfPoint> contours = new ArrayList<>();
@@ -205,10 +202,12 @@ public class ImgProcessor {
         Imgproc.filter2D(original, bottomLeft,  -1, kernelGenerator(3));
         Imgproc.filter2D(original, bottomRight, -1, kernelGenerator(4));
 
-        Log.showResult(topRight);
-        Log.showResult(bottomLeft);
-        Log.showResult(topLeft);
-        Log.showResult(bottomRight);
+        Mat combinedMat =  topRight.clone();
+        add(combinedMat, topLeft, combinedMat);
+        add(combinedMat, bottomRight, combinedMat);
+        add(combinedMat, bottomLeft, combinedMat);
+
+        Log.showResult(combinedMat);
 
         int threshold = 1;
 
@@ -217,7 +216,26 @@ public class ImgProcessor {
         ArrayList<Point> bottomRightCorners = highPassFilter(bottomLeft, threshold);
         ArrayList<Point> bottomLeftCorners = highPassFilter(bottomRight, threshold);
 
-        return null;
+        compensateMissingPoints(topRightCorners, topLeftCorners, bottomRightCorners, bottomLeftCorners);
+
+        topLeftCorners = orderVertexLists(5, topLeftCorners);
+        topRightCorners = orderVertexLists(5, topRightCorners);
+        bottomLeftCorners = orderVertexLists(5, bottomLeftCorners);
+        bottomRightCorners = orderVertexLists(5, bottomRightCorners);
+
+        ArrayList<ArrayList<Point>> areasOfInterest = retrieveCells(topRightCorners, topLeftCorners,
+                                                                    bottomRightCorners, bottomLeftCorners);
+
+        for(int i = 0; i < areasOfInterest.size(); i++) {
+            System.out.println("Cell: " + i);
+            for(int j = 0; j < areasOfInterest.get(i).size(); j++) {
+                double x = areasOfInterest.get(i).get(j).x;
+                double y = areasOfInterest.get(i).get(j).y;
+                System.out.println("_____Point: " + x + ", " + y);
+            }
+        }
+
+        return areasOfInterest;
     }
 
     private Mat kernelGenerator(int quadrant) {
@@ -283,6 +301,137 @@ public class ImgProcessor {
                 if(image.get(y, x)[0] > threshold) result.add(new Point(x, y));
 
         return result;
+    }
+
+
+    /**
+     * Checks 4 lists of points and analyzes if there is any point missing from the same index by checking proximity
+     * @return boolean number of missing points that were inserted into the lists
+     */
+    private int compensateMissingPoints(ArrayList<Point>topRightCorners, ArrayList<Point>topLeftCorners,
+                                        ArrayList<Point>bottomRightCorners, ArrayList<Point> bottomLeftCorners) {
+        int changes = 0;
+        Point missing = null;
+
+        int size = Math.max(Math.max(Math.max(topLeftCorners.size(), topRightCorners.size()), bottomLeftCorners.size()), bottomRightCorners.size());
+
+        for(int i = 0; i < size; i++) {
+            Point upperLeft = topLeftCorners.get(i);
+            Point upperRight = topRightCorners.get(i);
+            Point bottomLeft = bottomLeftCorners.get(i);
+            Point bottomRight = bottomRightCorners.get(i);
+
+            double range = 15; // pixel range
+
+            double diff_UL_UR = Math.abs(upperLeft.x - upperRight.x) + Math.abs(upperLeft.y - upperRight.y);
+            double diff_BR_UR = Math.abs(bottomRight.x - upperRight.x) + Math.abs(bottomRight.y - upperRight.y);
+            double diff_UL_BL = Math.abs(upperLeft.x - bottomLeft.x) + Math.abs(upperLeft.y - bottomLeft.y);
+            double diff_BL_BR = Math.abs(bottomLeft.x - bottomRight.x) + Math.abs(bottomLeft.y - bottomRight.y);
+
+            if(diff_BL_BR > range && diff_UL_BL > range) {
+                // Bottom left point is incorrect, create new
+                missing = new Point(upperLeft.x, bottomRight.y);
+                bottomLeftCorners.add(i, missing);
+            }
+            if(diff_BL_BR > range && diff_BR_UR > range) {
+                // Bottom right point is incorrect, create new
+                missing = new Point(upperRight.x, bottomLeft.y);
+                bottomRightCorners.add(i, missing);
+            }
+            if(diff_UL_UR > range && diff_UL_BL > range) {
+                // Upper left point is incorrect, create new
+                missing = new Point(bottomLeft.x, upperRight.y);
+                topLeftCorners.add(i, missing);
+            }
+            if(diff_BL_BR > range && diff_UL_BL > range) {
+                // Upper right point is incorrect, create new
+                missing = new Point(bottomRight.x, upperLeft.y);
+                topRightCorners.add(i, missing);
+            }
+
+            if(missing != null) {
+                System.out.println("Missing Point : " + missing.x + ", " + missing.y);
+                missing = null;
+            }
+        }
+
+        return changes;
+    }
+
+    private ArrayList<ArrayList<Point>> retrieveCells(ArrayList<Point>topRightCorners, ArrayList<Point>topLeftCorners,
+                                                      ArrayList<Point>bottomRightCorners, ArrayList<Point> bottomLeftCorners) {
+
+        ArrayList<ArrayList<Point>> result = new ArrayList<ArrayList<Point>>();
+
+        if(topLeftCorners.size() != topRightCorners.size() ||
+                topLeftCorners.size() != bottomRightCorners.size() ||
+                topLeftCorners.size() != bottomLeftCorners.size()){
+            System.out.print("The number of points is incorrect");
+            return null;
+        }
+
+        double xDiff = 0; // difference in x values between the previous point and the current one
+        ArrayList<Point> temp = null;
+
+        for( int i = 0; i < topLeftCorners.size(); i++ ) {
+            if(i == 0)
+                xDiff = -1;
+            else
+                xDiff = topLeftCorners.get(i).x - topLeftCorners.get(i-1).x;
+
+            System.out.println("X diff = " + xDiff);
+
+            if(xDiff < 0 ) {
+                System.out.println("I value: " + i);
+                if(i > 0 )
+                    System.out.println(topLeftCorners.get(i).x + "," + topLeftCorners.get(i-1).x);
+                i++;
+                continue;
+            }
+
+            temp = new ArrayList<Point>();
+
+            temp.add(topLeftCorners.get(i));
+            temp.add(topRightCorners.get(i-1));
+            temp.add(bottomLeftCorners.get(i));
+            temp.add(bottomRightCorners.get(i-1));
+            result.add(temp);
+
+            i++;
+        }
+
+        return result;
+    }
+
+    private ArrayList<Point> orderVertexLists(double range, ArrayList<Point> vertexList) {
+
+        ArrayList<Point> result = new ArrayList<Point>();
+
+        ArrayList<Point> temp;
+
+        Comparator<Point> pointXComparator = new Comparator<Point>(){
+            @Override
+            public int compare(final Point o1, final Point o2){
+                int x1 = (int) o1.x;
+                int x2 = (int) o2.x;
+                return x1 - x2;
+            }
+        };
+
+        while(!vertexList.isEmpty()) {
+            final double height = vertexList.get(0).y;
+
+            temp = vertexList.stream().filter(s -> Math.abs(s.y - height) < range).collect(Collectors.toCollection(ArrayList::new));
+
+            temp.sort(pointXComparator);
+
+            vertexList.removeAll(temp);
+
+            result.addAll(temp);
+        }
+
+        return result;
+
     }
 
 }
