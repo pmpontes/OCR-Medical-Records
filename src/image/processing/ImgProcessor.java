@@ -370,8 +370,14 @@ public class ImgProcessor {
             return null;
         }
 
+        System.out.println("Number of points: " + topLeftCorners.size());
+
         double xDiff = 0; // difference in x values between the previous point and the current one
         ArrayList<Point> temp = null;
+
+        boolean starter = true;
+        boolean toggleDetection = true;
+        int dotWidth = 0;
 
         for( int i = 0; i < topLeftCorners.size(); i++ ) {
             if(i == 0)
@@ -383,21 +389,28 @@ public class ImgProcessor {
 
             if(xDiff < 0 ) {
                 System.out.println("I value: " + i);
-                if(i > 0 )
-                    System.out.println(topLeftCorners.get(i).x + "," + topLeftCorners.get(i-1).x);
-                i++;
+                if(i > 0 ) {
+                    if(starter) {
+                        starter = false;
+                        dotWidth = i;
+                    }
+                }
                 continue;
             }
 
-            temp = new ArrayList<Point>();
+            if(!starter) {
+                System.out.println("Toggled: " + i);
+                temp = new ArrayList<Point>();
 
-            temp.add(topLeftCorners.get(i));
-            temp.add(topRightCorners.get(i-1));
-            temp.add(bottomLeftCorners.get(i));
-            temp.add(bottomRightCorners.get(i-1));
-            result.add(temp);
+                temp.add(bottomRightCorners.get(i - dotWidth - 1));
+                temp.add(bottomLeftCorners.get(i - dotWidth));
+                temp.add(topRightCorners.get(i - 1));
+                temp.add(topLeftCorners.get(i));
+                result.add(temp);
+            } else {
+                System.out.println("Untoggled: " + i);
+            }
 
-            i++;
         }
 
         return result;
