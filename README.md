@@ -8,6 +8,7 @@ Developed for a Programming Paradigms course.
 
 ### Pre-requisites
 
+
 * OpenCV;
 * Tessaract;
 * Tomcat.
