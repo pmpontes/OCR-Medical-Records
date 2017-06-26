@@ -48,14 +48,9 @@ public class CharacterRecognitionHandler {
         try {
             String result= tessInst.doOCR(file, cell);
             return result;
-        } catch (TesseractException e) {
+        } catch (Exception e) {
             Log.error("Error while performing OCR operation on file " + file.getName());
             return null;
         }
-    }
-
-    // for test purposes
-    public static void main(String[] args) {
-        Log.info(CharacterRecognitionHandler.getInstance().doOCR("G:/Documents/GitHub/OCR-Medical-Records/test files/table_cell.jpg"));
     }
 }

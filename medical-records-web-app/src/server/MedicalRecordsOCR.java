@@ -40,12 +40,16 @@ public class MedicalRecordsOCR {
             return null;
         }
 
+        Log.error(cells.toString());
+
         Records patientRecords = new Records();
 
         String cellText = "";
         for (int i = 0; i < cells.size();) {
             try {
                 String date = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
+
+                System.err.println("apsidpajsfj");
 
                 String age = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
 

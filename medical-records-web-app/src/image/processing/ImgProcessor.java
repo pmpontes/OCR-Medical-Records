@@ -36,9 +36,9 @@ public class ImgProcessor {
 
         // TODO check if the test condition is valid (different from c++ implementation)
         // Check if image is loaded fine
-        /*if(originalImg.empty()){
+        if(originalImg.empty()){
             Log.error("Error loading image.");
-        }*/
+        }
 
         // TODO check if necessary
         // resizing for practical reasons
@@ -292,11 +292,6 @@ public class ImgProcessor {
                 missing = new Point(bottomRight.x, upperLeft.y);
                 topRightCorners.add(i, missing);
             }
-
-            if(missing != null) {
-                System.out.println("Missing Point : " + missing.x + ", " + missing.y);
-                missing = null;
-            }
         }
 
         return changes;
@@ -310,11 +305,8 @@ public class ImgProcessor {
         if(topLeftCorners.size() != topRightCorners.size() ||
                 topLeftCorners.size() != bottomRightCorners.size() ||
                 topLeftCorners.size() != bottomLeftCorners.size()){
-            System.out.print("The number of points is incorrect");
             return null;
         }
-
-        System.out.println("Number of points: " + topLeftCorners.size());
 
         double xDiff = 0; // difference in x values between the previous point and the current one
         Rectangle temp = null;
@@ -329,10 +321,7 @@ public class ImgProcessor {
             else
                 xDiff = topLeftCorners.get(i).x - topLeftCorners.get(i-1).x;
 
-            System.out.println("X diff = " + xDiff);
-
             if(xDiff < 0 ) {
-                System.out.println("I value: " + i);
                 if(i > 0 ) {
                     if(starter) {
                         starter = false;
@@ -343,8 +332,6 @@ public class ImgProcessor {
             }
 
             if(!starter) {
-                System.out.println("Toggled: " + i);
-
                 double width = bottomLeftCorners.get(i-dotWidth).x - bottomRightCorners.get(i-dotWidth-1).x;
 
                 double height = topRightCorners.get(i-1).y - bottomRightCorners.get(i).y;
@@ -352,14 +339,7 @@ public class ImgProcessor {
                 temp = new Rectangle((int) bottomRightCorners.get(i-dotWidth-1).x, (int) bottomRightCorners.get(i-dotWidth-1).y,
                         (int) width, (int) height);
 
-                /*temp.add(bottomRightCorners.get(i - dotWidth - 1));
-                temp.add(bottomLeftCorners.get(i - dotWidth));
-                temp.add(topRightCorners.get(i - 1));
-                temp.add(topLeftCorners.get(i)); */
-
                 result.add(temp);
-            } else {
-                System.out.println("Untoggled: " + i);
             }
 
         }
