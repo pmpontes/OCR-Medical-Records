@@ -13,6 +13,6 @@ public class Main {
         }*/
 
         ImgProcessor img = new ImgProcessor("test files/table2.jpg"); // for test purposes
-        img.findContours();
+        img.divideTableIntoCells();
     }
 }

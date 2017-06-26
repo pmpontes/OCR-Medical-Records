@@ -27,9 +27,12 @@ public class ImgProcessor {
     private Mat originalImg = null;
     private Mat processedImg = new Mat();
 
+    private ArrayList<Rectangle> cells;
+
     public ImgProcessor(String fileName) {
         // Load originalImg image
         originalImg = imread(fileName);
+        cells = null;
 
         // TODO check if the test condition is valid (different from c++ implementation)
         // Check if image is loaded fine
@@ -130,65 +133,12 @@ public class ImgProcessor {
 
         Log.showResult(jointPoints);
 
-        processVertexes(jointPoints);
+        this.cells = processVertexes(jointPoints);
 
-/*
-        ///////////TODO test everything from here on
-        Mat hierarchy = new Mat();
-        List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(mask, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, new Point(0, 0));
-
-        List<Rect> boundRect = new ArrayList<>(contours.size());
-        List<Mat> rois = new ArrayList<>();
-
-        processVertexes(jointPoints);
-
-        /*
-        System.out.println(contours.size());
-
-        for (int i = 0; i < contours.size(); i++)
-        {
-            // find the area of each contour
-            double area = contourArea(contours.get(i));
-
-            // filter individual lines of blobs that might exist and they do not represent a table
-            if(area < 100) // value is randomly chosen, you will need to find that by yourself with trial and error procedure
-                continue;
-
-            MatOfPoint2f origin_contour = new MatOfPoint2f();
-            MatOfPoint2f destination_contour = new MatOfPoint2f();
-            contours.get(i).convertTo(origin_contour, CvType.CV_32S);
-            contours.get(i).convertTo(destination_contour, CvType.CV_32S);
-            approxPolyDP(origin_contour, destination_contour, 3.0, true);
-            boundRect.set(i, boundingRect(new MatOfPoint(destination_contour)));
-
-            // find the number of joints that each table has
-            //Mat roi = joints(boundRect.get(i));
-
-            List<MatOfPoint> joints_contours = new ArrayList<>();
-            //findContours(roi, joints_contours, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
-
-            // if the number is not more than 5 then most likely it not a table
-            if(joints_contours.size() <= 4)
-                continue;
-
-            //rois.add(rsz.(boundRect[i]).clone());
-
-            rectangle(processedImg, boundRect.get(i).tl(), boundRect.get(i).br(), new Scalar(0, 255, 0), 1, 8, 0 );
-        }
-
-        //Log.showResult(processedImg);
-
-        /*for(int i = 0; i < rois.size(); ++i) {
-        // Now you can do whatever post process you want
-        // with the data within the rectangles/tables.
-           // imshow("roi", rois[i]);
-        }*/
         return null;
-        //return jointPoints;
     }
 
-    public ArrayList<ArrayList<Point>> processVertexes(Mat original) {
+    public ArrayList<Rectangle> processVertexes(Mat original) {
         boolean foundVertex = false;
         int currDistanceX = 0;
         int currDistanceY = 0;
@@ -226,17 +176,8 @@ public class ImgProcessor {
         bottomLeftCorners = orderVertexLists(5, bottomLeftCorners);
         bottomRightCorners = orderVertexLists(5, bottomRightCorners);
 
-        ArrayList<ArrayList<Point>> areasOfInterest = retrieveCells(topRightCorners, topLeftCorners,
+        ArrayList<Rectangle> areasOfInterest = retrieveCells(topRightCorners, topLeftCorners,
                                                                     bottomRightCorners, bottomLeftCorners);
-
-        for(int i = 0; i < areasOfInterest.size(); i++) {
-            System.out.println("Cell: " + i);
-            for(int j = 0; j < areasOfInterest.get(i).size(); j++) {
-                double x = areasOfInterest.get(i).get(j).x;
-                double y = areasOfInterest.get(i).get(j).y;
-                System.out.println("_____Point: " + x + ", " + y);
-            }
-        }
 
         return areasOfInterest;
     }
@@ -361,10 +302,10 @@ public class ImgProcessor {
         return changes;
     }
 
-    private ArrayList<ArrayList<Point>> retrieveCells(ArrayList<Point>topRightCorners, ArrayList<Point>topLeftCorners,
+    private ArrayList<Rectangle> retrieveCells(ArrayList<Point>topRightCorners, ArrayList<Point>topLeftCorners,
                                                       ArrayList<Point>bottomRightCorners, ArrayList<Point> bottomLeftCorners) {
 
-        ArrayList<ArrayList<Point>> result = new ArrayList<ArrayList<Point>>();
+        ArrayList<Rectangle> result = new ArrayList<Rectangle>();
 
         if(topLeftCorners.size() != topRightCorners.size() ||
                 topLeftCorners.size() != bottomRightCorners.size() ||
@@ -376,7 +317,7 @@ public class ImgProcessor {
         System.out.println("Number of points: " + topLeftCorners.size());
 
         double xDiff = 0; // difference in x values between the previous point and the current one
-        ArrayList<Point> temp = null;
+        Rectangle temp = null;
 
         boolean starter = true;
         boolean toggleDetection = true;
@@ -403,12 +344,19 @@ public class ImgProcessor {
 
             if(!starter) {
                 System.out.println("Toggled: " + i);
-                temp = new ArrayList<Point>();
 
-                temp.add(bottomRightCorners.get(i - dotWidth - 1));
+                double width = bottomLeftCorners.get(i-dotWidth).x - bottomRightCorners.get(i-dotWidth-1).x;
+
+                double height = topRightCorners.get(i-1).y - bottomRightCorners.get(i).y;
+
+                temp = new Rectangle((int) bottomRightCorners.get(i-dotWidth-1).x, (int) bottomRightCorners.get(i-dotWidth-1).y,
+                        (int) width, (int) height);
+
+                /*temp.add(bottomRightCorners.get(i - dotWidth - 1));
                 temp.add(bottomLeftCorners.get(i - dotWidth));
                 temp.add(topRightCorners.get(i - 1));
-                temp.add(topLeftCorners.get(i));
+                temp.add(topLeftCorners.get(i)); */
+
                 result.add(temp);
             } else {
                 System.out.println("Untoggled: " + i);
@@ -450,8 +398,10 @@ public class ImgProcessor {
 
     }
 
-    // TODO
+
     public ArrayList<Rectangle> divideTableIntoCells() {
-        return null;
+        findContours();
+
+        return cells;
     }
 }
