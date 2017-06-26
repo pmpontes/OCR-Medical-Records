@@ -1,12 +1,15 @@
 package image.processing;
 
 import org.opencv.core.*;
+import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
 import tools.Log;
 
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.opencv.core.Core.add;
@@ -447,4 +450,8 @@ public class ImgProcessor {
 
     }
 
+    // TODO
+    public ArrayList<Rectangle> divideTableIntoCells() {
+        return null;
+    }
 }
