@@ -334,7 +334,7 @@ public class ImgProcessor {
             if(!starter) {
                 double width = bottomLeftCorners.get(i-dotWidth).x - bottomRightCorners.get(i-dotWidth-1).x;
 
-                double height = topRightCorners.get(i-1).y - bottomRightCorners.get(i).y;
+                double height = topRightCorners.get(i-1).y - bottomRightCorners.get(i-dotWidth-1).y;
 
                 temp = new Rectangle((int) bottomRightCorners.get(i-dotWidth-1).x, (int) bottomRightCorners.get(i-dotWidth-1).y,
                         (int) width, (int) height);
