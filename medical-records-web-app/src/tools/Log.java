@@ -40,7 +40,7 @@ public class Log {
     }
 
     public static void showResult(Mat img) {
-        /*MatOfByte matOfByte = new MatOfByte();
+        MatOfByte matOfByte = new MatOfByte();
         Imgcodecs.imencode(".jpg", img, matOfByte);
         byte[] byteArray = matOfByte.toArray();
         BufferedImage bufImage = null;
@@ -53,6 +53,6 @@ public class Log {
             frame.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
     }
 }

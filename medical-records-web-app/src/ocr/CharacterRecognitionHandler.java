@@ -23,7 +23,7 @@ public class CharacterRecognitionHandler {
         tessInst.setTessVariable("load_system_dawg", "false");
 
         // reset the character set accepted
-        tessInst.setTessVariable("tessedit_char_whitelist", "AM0123456789-.,/");
+        tessInst.setTessVariable("tessedit_char_whitelist", "0123456789-.,/");
 
         handlerInst = this;
     }
@@ -49,9 +49,10 @@ public class CharacterRecognitionHandler {
 
     public String doOCR(File file, Rectangle cell){
         try {
-            Log.error("doOCR");
+            Log.info("doOCR");
+            Log.info(cell.toString());
             String result= tessInst.doOCR(file, cell);
-            Log.error("done OCR " + result);
+            Log.info("done OCR " + result);
             return result;
         } catch (Exception e) {
             Log.error("Error while performing OCR operation on file " + file.getName());
