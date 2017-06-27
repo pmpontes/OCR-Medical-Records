@@ -6,14 +6,17 @@ import java.io.File;
 import net.sourceforge.tess4j.*;
 import tools.Log;
 
+import javax.imageio.ImageIO;
+
 public class CharacterRecognitionHandler {
 
     private static CharacterRecognitionHandler handlerInst = null;
     private static Tesseract tessInst = null;
 
     private CharacterRecognitionHandler(){
+        ImageIO.scanForPlugins();
         tessInst = new Tesseract();
-        tessInst.setDatapath("tess\\tessdata");
+        tessInst.setDatapath("G:\\Documents\\GitHub\\OCR-Medical-Records\\medical-records-web-app\\tess\\tessdata");
 
         // disable dictionaries
         tessInst.setTessVariable("load_freq_dawg", "false");
@@ -46,7 +49,9 @@ public class CharacterRecognitionHandler {
 
     public String doOCR(File file, Rectangle cell){
         try {
-            String result= tessInst.doOCR(file);
+            Log.error("doOCR");
+            String result= tessInst.doOCR(file, cell);
+            Log.error("done OCR " + result);
             return result;
         } catch (Exception e) {
             Log.error("Error while performing OCR operation on file " + file.getName());
