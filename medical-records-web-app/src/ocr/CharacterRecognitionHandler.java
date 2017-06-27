@@ -26,7 +26,7 @@ public class CharacterRecognitionHandler {
     }
 
     public static CharacterRecognitionHandler getInstance(){
-        if(handlerInst == null){
+        if(handlerInst == null) {
             new CharacterRecognitionHandler();
         }
 
@@ -46,7 +46,7 @@ public class CharacterRecognitionHandler {
 
     public String doOCR(File file, Rectangle cell){
         try {
-            String result= tessInst.doOCR(file, cell);
+            String result= tessInst.doOCR(file);
             return result;
         } catch (Exception e) {
             Log.error("Error while performing OCR operation on file " + file.getName());

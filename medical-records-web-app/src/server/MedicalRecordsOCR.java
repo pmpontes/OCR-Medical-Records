@@ -35,7 +35,7 @@ public class MedicalRecordsOCR {
         ImgProcessor imgProcessor = new ImgProcessor(filePath);
         ArrayList<Rectangle> cells = imgProcessor.divideTableIntoCells();
 
-        if(cells == null) {
+        if(cells == null || cells.size() < 180) {
             Log.error("The specified file could not be processed.");
             return null;
         }
@@ -49,9 +49,9 @@ public class MedicalRecordsOCR {
             try {
                 String date = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
 
-                System.err.println("apsidpajsfj");
+                break;
 
-                String age = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
+              /*  String age = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
 
                 cellText = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
                 float weight = Float.parseFloat(cellText);
@@ -62,7 +62,7 @@ public class MedicalRecordsOCR {
                 cellText = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
                 float cephalicPerimeter = Float.parseFloat(cellText);
 
-                patientRecords.addRecordEntry(new Entry(date, age, weight, height, cephalicPerimeter));
+                patientRecords.addRecordEntry(new Entry(date, age, weight, height, cephalicPerimeter));*/
             } catch (Exception e) {
                 Log.error("An error occurred while analysing the file.");
                 e.printStackTrace();
