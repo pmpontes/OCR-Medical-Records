@@ -48,10 +48,9 @@ public class MedicalRecordsOCR {
         for (int i = 0; i < cells.size();) {
             try {
                 String date = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
+                Log.detail(date);
 
-                break;
-
-              /*  String age = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
+                String age = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
 
                 cellText = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
                 float weight = Float.parseFloat(cellText);
@@ -62,7 +61,9 @@ public class MedicalRecordsOCR {
                 cellText = CharacterRecognitionHandler.getInstance().doOCR(medicalRecordFile, cells.get(i++));
                 float cephalicPerimeter = Float.parseFloat(cellText);
 
-                patientRecords.addRecordEntry(new Entry(date, age, weight, height, cephalicPerimeter));*/
+                patientRecords.addRecordEntry(new Entry(date, age, weight, height, cephalicPerimeter));
+
+                break;
             } catch (Exception e) {
                 Log.error("An error occurred while analysing the file.");
                 e.printStackTrace();

@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 
 public class CharacterRecognitionHandler {
 
+    private static final int SINGLE_LINE_SEGMENTATION_MODE = 7;  // Treat the image as a single text line.
     private static CharacterRecognitionHandler handlerInst = null;
     private static Tesseract tessInst = null;
 
@@ -21,9 +22,11 @@ public class CharacterRecognitionHandler {
         // disable dictionaries
         tessInst.setTessVariable("load_freq_dawg", "false");
         tessInst.setTessVariable("load_system_dawg", "false");
+        tessInst.setTessVariable("user_patterns_suffix", "user-patterns");
 
         // reset the character set accepted
-        tessInst.setTessVariable("tessedit_char_whitelist", "0123456789-.,/");
+        tessInst.setTessVariable("tessedit_char_whitelist", "amd0123456789-.,/");
+        tessInst.setPageSegMode(SINGLE_LINE_SEGMENTATION_MODE);
 
         handlerInst = this;
     }
@@ -52,6 +55,18 @@ public class CharacterRecognitionHandler {
             Log.info("doOCR");
             Log.info(cell.toString());
             String result= tessInst.doOCR(file, cell);
+            Log.info("done OCR " + result);
+            return result;
+        } catch (Exception e) {
+            Log.error("Error while performing OCR operation on file " + file.getName());
+            return null;
+        }
+    }
+
+    public String doOCR(File file){
+        try {
+            Log.info("doOCR");
+            String result= tessInst.doOCR(file);
             Log.info("done OCR " + result);
             return result;
         } catch (Exception e) {

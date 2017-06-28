@@ -34,15 +34,13 @@ public class ImgProcessor {
         originalImg = imread(fileName);
         cells = null;
 
-        // TODO check if the test condition is valid (different from c++ implementation)
         // Check if image is loaded fine
         if(originalImg.empty()){
             Log.error("Error loading image.");
         }
 
-        // TODO check if necessary
         // resizing for practical reasons
-        resize(originalImg, processedImg, new Size(800, 900));
+        resize(originalImg, processedImg, new Size(2500, 3500));
 
         //Log.showResult(processedImg.clone());
     }
