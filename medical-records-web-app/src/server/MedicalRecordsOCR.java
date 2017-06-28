@@ -22,13 +22,14 @@ public class MedicalRecordsOCR {
 
     private static final String FILES_LOCATION = "G:\\Documents\\GitHub\\OCR-Medical-Records\\test files\\";
     private final String filePath;
+    private File originalMedicalRecordFile;
     private File processedMedicalRecordFile;
 
     public MedicalRecordsOCR(String filePath) {
         this.filePath = FILES_LOCATION + filePath;
 
-        File medicalRecordFile = new File(this.filePath);
-        if (!medicalRecordFile.exists()) {
+        originalMedicalRecordFile = new File(this.filePath);
+        if (!originalMedicalRecordFile.exists()) {
             Log.error("The specified file could not be opened: " + this.filePath);
         }
     }
@@ -71,11 +72,11 @@ public class MedicalRecordsOCR {
         try {
             Log.error("index: " + cellIndex);
 
-            String date = CharacterRecognitionHandler.getInstance().doOCR(processedMedicalRecordFile, entryCells.get(cellIndex++)).trim();
+            String date = CharacterRecognitionHandler.getInstance().doOCR(originalMedicalRecordFile, entryCells.get(cellIndex++)).replace(" ", "").trim();
             entryFilled = !date.isEmpty();
             Log.detail(date);
 
-            String age = CharacterRecognitionHandler.getInstance().doOCR(processedMedicalRecordFile, entryCells.get(cellIndex++), true).trim();
+            String age = CharacterRecognitionHandler.getInstance().doOCR(processedMedicalRecordFile, entryCells.get(cellIndex++), true).replace(" ", "").trim();
             entryFilled &= !age.isEmpty();
             Log.detail(age);
 
