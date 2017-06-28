@@ -25,7 +25,7 @@ public class CharacterRecognitionHandler {
         tessInst.setTessVariable("user_patterns_suffix", "user-patterns");
 
         // reset the character set accepted
-        tessInst.setTessVariable("tessedit_char_whitelist", "amd0123456789-.,/");
+        tessInst.setTessVariable("tessedit_char_whitelist", "md0123456789-.,");
         tessInst.setPageSegMode(SINGLE_LINE_SEGMENTATION_MODE);
 
         handlerInst = this;
