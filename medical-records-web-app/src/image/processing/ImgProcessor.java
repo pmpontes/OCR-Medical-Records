@@ -2,19 +2,22 @@ package image.processing;
 
 import org.opencv.core.*;
 import org.opencv.core.Point;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import tools.Log;
 
+import javax.imageio.ImageIO;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.opencv.core.Core.add;
-import static org.opencv.core.Core.bitwise_and;
-import static org.opencv.core.Core.bitwise_not;
+import static org.opencv.core.Core.*;
 import static org.opencv.imgcodecs.Imgcodecs.*;
 import static org.opencv.imgproc.Imgproc.*;
 import static org.opencv.core.Point.*;
@@ -24,10 +27,13 @@ public class ImgProcessor {
 
     private static final int VERTEX_MINIMUM_DISTANCE = 4;
 
+    private int NUMBER_OF_INTERSECTIONS = 209;
+
     private Mat originalImg = null;
     private Mat processedImg = new Mat();
 
     private ArrayList<Rectangle> cells;
+    private BufferedImage processedTable;
 
     public ImgProcessor(String fileName) {
         // Load originalImg image
@@ -37,12 +43,11 @@ public class ImgProcessor {
         // Check if image is loaded fine
         if(originalImg.empty()){
             Log.error("Error loading image.");
+            return;
         }
 
         // resizing for practical reasons
         resize(originalImg, processedImg, new Size(2500, 3500));
-
-        //Log.showResult(processedImg.clone());
     }
 
     private void createBinaryImage(){
@@ -82,8 +87,6 @@ public class ImgProcessor {
         // Apply morphology operations
         erode(horizontal.clone(), horizontal, horizontalStructure);
         dilate(horizontal.clone(), horizontal, horizontalStructure);
-        //erode(vertical, vertical, verticalStructure, new Point(-1, -1), 100); // TODO check if the Point is reall not necessary
-        //dilate(vertical, vertical, verticalStructure, new Point(-1, -1), 100);
 
         return horizontal;
     }
@@ -122,18 +125,32 @@ public class ImgProcessor {
         Mat mask = new Mat();
         add(horizontal, vertical, mask);
 
-        Log.showResult(processedImg);
-        Log.showResult(mask);
+        // Create structure element for extracting vertical lines through morphology operations
+        Mat cleanImg = saveProcessedImg(mask);
+        //Log.showResult(cleanImg);
+        //Log.showResult(processedImg);
+        //Log.showResult(mask);
 
         // find the joints between the lines of the tables, we will use this information in order to discriminate tables from pictures (tables will contain more than 4 joints while a picture only 4 (i.e. at the corners))
         Mat jointPoints = new Mat();
         bitwise_and(horizontal, vertical, jointPoints);
 
-        Log.showResult(jointPoints);
+        //Log.showResult(jointPoints);
 
         this.cells = processVertexes(jointPoints);
 
         return null;
+    }
+
+    private Mat saveProcessedImg(Mat mask) {
+        Mat structure = getStructuringElement(MORPH_RECT, new Size(7,7));
+        Mat cleanImg = new Mat();
+        Mat maskDilated = new Mat();
+        dilate(mask.clone(), maskDilated, structure);
+        subtract(processedImg, maskDilated, cleanImg);
+        processedTable = new BufferedImage(cleanImg.width(), cleanImg.height(), BufferedImage.TYPE_3BYTE_BGR);
+        imwrite("G:\\Documents\\GitHub\\OCR-Medical-Records\\medical-records-web-app\\processed_img.jpg", cleanImg);
+        return cleanImg;
     }
 
     public ArrayList<Rectangle> processVertexes(Mat original) {
@@ -148,6 +165,8 @@ public class ImgProcessor {
         Mat bottomLeft = new Mat();
         Mat bottomRight = new Mat();
 
+        //imwrite("G:\\Documents\\GitHub\\OCR-Medical-Records\\medical-records-web-app\\body.png", original);
+
         Imgproc.filter2D(original, topRight,    -1, kernelGenerator(1));
         Imgproc.filter2D(original, topLeft,     -1, kernelGenerator(2));
         Imgproc.filter2D(original, bottomLeft,  -1, kernelGenerator(3));
@@ -158,7 +177,7 @@ public class ImgProcessor {
         add(combinedMat, bottomRight, combinedMat);
         add(combinedMat, bottomLeft, combinedMat);
 
-        Log.showResult(combinedMat);
+        //Log.showResult(combinedMat);
 
         int threshold = 1;
 
@@ -167,16 +186,19 @@ public class ImgProcessor {
         ArrayList<Point> bottomRightCorners = highPassFilter(bottomLeft, threshold);
         ArrayList<Point> bottomLeftCorners = highPassFilter(bottomRight, threshold);
 
-        compensateMissingPoints(topRightCorners, topLeftCorners, bottomRightCorners, bottomLeftCorners);
-
         topLeftCorners = orderVertexLists(5, topLeftCorners);
         topRightCorners = orderVertexLists(5, topRightCorners);
         bottomLeftCorners = orderVertexLists(5, bottomLeftCorners);
         bottomRightCorners = orderVertexLists(5, bottomRightCorners);
 
+        compensateMissingPoints(topRightCorners, topLeftCorners, bottomRightCorners, bottomLeftCorners);
+
         ArrayList<Rectangle> areasOfInterest = retrieveCells(topRightCorners, topLeftCorners,
                                                                     bottomRightCorners, bottomLeftCorners);
 
+        MatOfByte matOfByte = new MatOfByte();
+        //Imgcodecs.imencode(".jpg", combinedMat, matOfByte);
+        //imwrite("G:\\Documents\\GitHub\\OCR-Medical-Records\\medical-records-web-app\\some.png", combinedMat);
         return areasOfInterest;
     }
 
@@ -255,14 +277,24 @@ public class ImgProcessor {
         int changes = 0;
         Point missing = null;
 
-        int size = Math.max(Math.max(Math.max(topLeftCorners.size(), topRightCorners.size()), bottomLeftCorners.size()), bottomRightCorners.size());
-
-        for(int i = 0; i < size; i++) {
-
+/*
+        System.out.println("TopLeft initial: " + topLeftCorners.size());
+        System.out.println("TopRight initial: " + topRightCorners.size());
+        System.out.println("BottomLeft initial: " + bottomLeftCorners.size());
+        System.out.println("BottomRight initial: " + bottomRightCorners.size());
+*/
+        for(int i = 0; i < NUMBER_OF_INTERSECTIONS; i++) {
+/*
+            System.out.println("Iteration: " + i);
+            System.out.println("TopLeft iterate: " + topLeftCorners.size());
+            System.out.println("TopRight iterate: " + topRightCorners.size());
+            System.out.println("BottomLeft iterate: " + bottomLeftCorners.size());
+            System.out.println("BottomRight iterate: " + bottomRightCorners.size());
+*/
             if(i >= topLeftCorners.size() || i >= topRightCorners.size() ||
                 i >= bottomLeftCorners.size() || i >= bottomRightCorners.size()){
 
-                if(i => topLeftCorners.size()){
+                if(i >= topLeftCorners.size()){
                     Point upperRight = topRightCorners.get(i);
                     Point bottomLeft = bottomLeftCorners.get(i);
                     Point bottomRight = bottomRightCorners.get(i);
@@ -270,7 +302,7 @@ public class ImgProcessor {
                     missing = new Point(bottomLeft.x, upperRight.y);
                     topLeftCorners.add(i, missing);
                 }
-                if(i => topRightCorners.size()){
+                if(i >= topRightCorners.size()){
                     Point upperLeft = topLeftCorners.get(i);
                     Point bottomLeft = bottomLeftCorners.get(i);
                     Point bottomRight = bottomRightCorners.get(i);
@@ -278,7 +310,7 @@ public class ImgProcessor {
 
                     topRightCorners.add(i, missing);
                 }
-                if(i => bottomLeftCorners.size()){
+                if(i >= bottomLeftCorners.size()){
                     Point upperLeft = topLeftCorners.get(i);
                     Point upperRight = topRightCorners.get(i);
                     Point bottomRight = bottomRightCorners.get(i);
@@ -286,7 +318,7 @@ public class ImgProcessor {
                     missing = new Point(upperLeft.x, bottomRight.y);
                     bottomLeftCorners.add(i, missing);
                 }
-                if(i => bottomRightCorners.size()){
+                if(i >= bottomRightCorners.size()){
                     Point upperLeft = topLeftCorners.get(i);
                     Point upperRight = topRightCorners.get(i);
                     Point bottomLeft = bottomLeftCorners.get(i);
@@ -302,8 +334,6 @@ public class ImgProcessor {
             Point upperRight = topRightCorners.get(i);
             Point bottomLeft = bottomLeftCorners.get(i);
             Point bottomRight = bottomRightCorners.get(i);
-
-
 
             double range = 15; // pixel range
 
@@ -327,7 +357,7 @@ public class ImgProcessor {
                 missing = new Point(bottomLeft.x, upperRight.y);
                 topLeftCorners.add(i, missing);
             }
-            if(diff_BL_BR > range && diff_UL_BL > range) {
+            if(diff_UL_UR > range && diff_BR_UR > range) {
                 // Upper right point is incorrect, create new
                 missing = new Point(bottomRight.x, upperLeft.y);
                 topRightCorners.add(i, missing);
@@ -345,6 +375,12 @@ public class ImgProcessor {
         if(topLeftCorners.size() != topRightCorners.size() ||
                 topLeftCorners.size() != bottomRightCorners.size() ||
                 topLeftCorners.size() != bottomLeftCorners.size()){
+/*
+            System.out.println("TopLeft final: " + topLeftCorners.size());
+            System.out.println("TopRight final: " + topRightCorners.size());
+            System.out.println("BottomLeft final: " + bottomLeftCorners.size());
+            System.out.println("BottomRight final: " + bottomRightCorners.size());
+*/
             return null;
         }
 
@@ -423,5 +459,9 @@ public class ImgProcessor {
         findContours();
 
         return cells;
+    }
+
+    public BufferedImage getProcessedTable() {
+        return processedTable;
     }
 }

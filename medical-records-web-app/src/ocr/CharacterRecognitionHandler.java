@@ -25,7 +25,7 @@ public class CharacterRecognitionHandler {
         tessInst.setTessVariable("user_patterns_suffix", "user-patterns");
 
         // reset the character set accepted
-        tessInst.setTessVariable("tessedit_char_whitelist", "md0123456789-.,");
+        tessInst.setTessVariable("tessedit_char_whitelist", "md0123456789.,");
         tessInst.setPageSegMode(SINGLE_LINE_SEGMENTATION_MODE);
 
         handlerInst = this;
@@ -39,38 +39,24 @@ public class CharacterRecognitionHandler {
         return handlerInst;
     }
 
-    public String doOCR(String filePath){
-        try {
-            File file = new File(filePath);
-            String result= tessInst.doOCR(file);
-            return result;
-        } catch (TesseractException e) {
-            Log.error("Error while performing OCR operation on file " + filePath);
-            return null;
-        }
-    }
-
     public String doOCR(File file, Rectangle cell){
-        try {
-            Log.info("doOCR");
-            Log.info(cell.toString());
-            String result= tessInst.doOCR(file, cell);
-            Log.info("done OCR " + result);
-            return result;
-        } catch (Exception e) {
-            Log.error("Error while performing OCR operation on file " + file.getName());
-            return null;
-        }
+        return doOCR(file, cell, false);
     }
 
-    public String doOCR(File file){
+    public String doOCR(File file, Rectangle cell, boolean acceptLetters){
+        if (acceptLetters) {
+            // reset the character set accepted
+            tessInst.setTessVariable("tessedit_char_whitelist", "md0123456789.,");
+        } else {
+            // reset the character set accepted
+            tessInst.setTessVariable("tessedit_char_whitelist", "0123456789.,");
+        }
+
         try {
-            Log.info("doOCR");
-            String result= tessInst.doOCR(file);
-            Log.info("done OCR " + result);
-            return result;
+            Log.error(cell.toString());
+            return tessInst.doOCR(file, cell);
         } catch (Exception e) {
-            Log.error("Error while performing OCR operation on file " + file.getName());
+            Log.error("Error while performing OCR operation.");
             return null;
         }
     }
