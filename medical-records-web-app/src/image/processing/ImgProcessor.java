@@ -258,10 +258,36 @@ public class ImgProcessor {
         int size = Math.max(Math.max(Math.max(topLeftCorners.size(), topRightCorners.size()), bottomLeftCorners.size()), bottomRightCorners.size());
 
         for(int i = 0; i < size; i++) {
+
+            if(i => topLeftCorners.size() || i => topRightCorners.size() ||
+                i => bottomLeftCorners.size() || i => bottomRightCorners.size()){
+
+                if(i => topLeftCorners.size()){
+                    missing = new Point(bottomLeft.x, upperRight.y);
+                    topLeftCorners.add(i, missing);
+                }
+                if(i => topRightCorners.size()){
+                    missing = new Point(bottomRight.x, upperLeft.y);
+                    topRightCorners.add(i, missing);
+                }
+                if(i => bottomLeftCorners.size()){
+                    missing = new Point(upperLeft.x, bottomRight.y);
+                    bottomLeftCorners.add(i, missing);
+                }
+                if(i => bottomRightCorners.size()){
+                    missing = new Point(upperRight.x, bottomLeft.y);
+                    bottomRightCorners.add(i, missing);
+                }
+
+                continue;
+            }
+
             Point upperLeft = topLeftCorners.get(i);
             Point upperRight = topRightCorners.get(i);
             Point bottomLeft = bottomLeftCorners.get(i);
             Point bottomRight = bottomRightCorners.get(i);
+
+
 
             double range = 15; // pixel range
 
