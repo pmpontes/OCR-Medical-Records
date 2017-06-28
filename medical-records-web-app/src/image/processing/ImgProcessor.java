@@ -259,22 +259,38 @@ public class ImgProcessor {
 
         for(int i = 0; i < size; i++) {
 
-            if(i => topLeftCorners.size() || i => topRightCorners.size() ||
-                i => bottomLeftCorners.size() || i => bottomRightCorners.size()){
+            if(i >= topLeftCorners.size() || i >= topRightCorners.size() ||
+                i >= bottomLeftCorners.size() || i >= bottomRightCorners.size()){
 
                 if(i => topLeftCorners.size()){
+                    Point upperRight = topRightCorners.get(i);
+                    Point bottomLeft = bottomLeftCorners.get(i);
+                    Point bottomRight = bottomRightCorners.get(i);
+
                     missing = new Point(bottomLeft.x, upperRight.y);
                     topLeftCorners.add(i, missing);
                 }
                 if(i => topRightCorners.size()){
+                    Point upperLeft = topLeftCorners.get(i);
+                    Point bottomLeft = bottomLeftCorners.get(i);
+                    Point bottomRight = bottomRightCorners.get(i);
                     missing = new Point(bottomRight.x, upperLeft.y);
+
                     topRightCorners.add(i, missing);
                 }
                 if(i => bottomLeftCorners.size()){
+                    Point upperLeft = topLeftCorners.get(i);
+                    Point upperRight = topRightCorners.get(i);
+                    Point bottomRight = bottomRightCorners.get(i);
+
                     missing = new Point(upperLeft.x, bottomRight.y);
                     bottomLeftCorners.add(i, missing);
                 }
                 if(i => bottomRightCorners.size()){
+                    Point upperLeft = topLeftCorners.get(i);
+                    Point upperRight = topRightCorners.get(i);
+                    Point bottomLeft = bottomLeftCorners.get(i);
+
                     missing = new Point(upperRight.x, bottomLeft.y);
                     bottomRightCorners.add(i, missing);
                 }
