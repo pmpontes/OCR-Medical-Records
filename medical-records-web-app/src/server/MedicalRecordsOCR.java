@@ -37,7 +37,7 @@ public class MedicalRecordsOCR {
     public JSONObject process() {
         ImgProcessor imgProcessor = new ImgProcessor(filePath);
         ArrayList<Rectangle> cells = imgProcessor.divideTableIntoCells();
-        processedMedicalRecordFile = new File("G:\\Documents\\GitHub\\OCR-Medical-Records\\medical-records-web-app\\processed_img.jpg");
+        processedMedicalRecordFile = new File(FILES_LOCATION + "processed_img.jpg");
 
         Records patientRecords = new Records();
 
@@ -49,6 +49,8 @@ public class MedicalRecordsOCR {
         if (processColumn(0, cells, patientRecords)) {
             processColumn(1, cells, patientRecords);
         }
+
+        processedMedicalRecordFile.delete();
 
         return patientRecords.toJSON();
     }
