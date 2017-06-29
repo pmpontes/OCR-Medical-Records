@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>OCR for medical documents</title>
+    <title>OCR for Medical Records</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -60,7 +60,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand topnav" href="#">OCR for medical documents</a>
+                <a class="navbar-brand topnav" href="#">OCR for Medical Records</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -90,7 +90,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="intro-message">
-                        <h1>OCR for medical documents</h1>
+                        <h1>OCR for Medical Records</h1>
                         <h3>FEUP - Programming Paradigms - 2016/2017</h3>
                         <hr class="intro-divider">
                         <ul class="list-inline intro-social-buttons">
@@ -167,17 +167,11 @@
                 <div class="col-xs-12 col-lg-6">
                     <ul class="list-inline banner-social-buttons">
                         <li>
-                            <a href="https://fe.up.pt/" class="btn btn-default btn-lg btn-block"><i class="fa fa-globe fa-fw"></i> <span class="network-name">FEUP</span></a>
-                        </li>
-                        <li>
-                            <a href="mailto:rui.vilares@hotmail.com" class="btn btn-default btn-lg btn-block"><i class="fa fa-envelope fa-fw"></i> <span class="network-name">Email</span></a>
-                        </li>
-                        <li>
-                            <a href="https://github.com/" class="btn btn-default btn-lg btn-block"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
-                        </li>
-                        <li>
-                            <a href="https://www.linkedin.com/school/6498?pathWildcard=6498/" class="btn btn-default btn-lg btn-block"><i class="fa fa-linkedin fa-fw"></i> <span class="network-name">Linkedin</span></a>
-                        </li>
+                                                   <a href="https://fe.up.pt/" class="btn btn-default btn-lg btn-block"><i class="fa fa-globe fa-fw"></i> <span class="network-name">FEUP</span></a>
+                                               </li>
+                                               <li>
+                                                   <a href="https://github.com/pmpontes/OCR-Medical-Records" class="btn btn-default btn-lg btn-block"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
+                                               </li>
                     </ul>
                 </div>
             </div>
@@ -222,18 +216,18 @@
   <div class="modal-dialog">
 
     <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">OCR for medical documents</h4>
-      </div>
-      <div class="modal-body">
-        <p>Some text in the modal.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">OCR for Medical Records</h4>
+          </div>
+          <div class="modal-body">
+            <p>Developed within the scope of the Programming Paradigms course, this project envisioned the implementation of an OCR tool for digitizing medical records. More specifically, this tool is able to perform OCR on the growth chart kept in a child's individual health record - with handwritten information about the child's height, weight and cephalic perimeter at a given date and age - and display its contents.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
 
   </div>
 </div>
