@@ -20,7 +20,7 @@ public class MedicalRecordsOCR {
     // Compulsory
     static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
 
-    private static final String FILES_LOCATION = "G:\\Documents\\GitHub\\OCR-Medical-Records\\test files\\";
+    public static final String FILES_LOCATION = "G:\\Documents\\GitHub\\OCR-Medical-Records\\test files\\";
     private final String filePath;
     private File originalMedicalRecordFile;
     private File processedMedicalRecordFile;
@@ -78,7 +78,7 @@ public class MedicalRecordsOCR {
             entryFilled = !date.isEmpty();
             Log.detail(date);
 
-            String age = CharacterRecognitionHandler.getInstance().doOCR(processedMedicalRecordFile, entryCells.get(cellIndex++), true).replace(" ", "").trim();
+            String age = CharacterRecognitionHandler.getInstance().doOCR(processedMedicalRecordFile, entryCells.get(cellIndex++), true).replace(" ", "").replace(".", "").trim();
             entryFilled &= !age.isEmpty();
             Log.detail(age);
 

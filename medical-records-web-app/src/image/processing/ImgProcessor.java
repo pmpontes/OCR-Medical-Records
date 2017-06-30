@@ -4,6 +4,7 @@ import org.opencv.core.*;
 import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import server.MedicalRecordsOCR;
 import tools.Log;
 
 import javax.imageio.ImageIO;
@@ -149,7 +150,7 @@ public class ImgProcessor {
         dilate(mask.clone(), maskDilated, structure);
         subtract(processedImg, maskDilated, cleanImg);
         processedTable = new BufferedImage(cleanImg.width(), cleanImg.height(), BufferedImage.TYPE_3BYTE_BGR);
-        imwrite("G:\\Documents\\GitHub\\OCR-Medical-Records\\medical-records-web-app\\processed_img.jpg", cleanImg);
+        imwrite(MedicalRecordsOCR.FILES_LOCATION + "processed_img.jpg", cleanImg);
         return cleanImg;
     }
 
