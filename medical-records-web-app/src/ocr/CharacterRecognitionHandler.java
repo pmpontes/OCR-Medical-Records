@@ -53,7 +53,7 @@ public class CharacterRecognitionHandler {
         }
 
         try {
-            Log.error(cell.toString());
+            Log.detail(cell.toString());
             return tessInst.doOCR(file, cell);
         } catch (Exception e) {
             Log.error("Error while performing OCR operation.");

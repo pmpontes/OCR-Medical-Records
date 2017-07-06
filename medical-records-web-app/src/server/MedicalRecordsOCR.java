@@ -72,8 +72,6 @@ public class MedicalRecordsOCR {
     private Entry processEntry(ArrayList<Rectangle> entryCells, int cellIndex) {
         boolean entryFilled;
         try {
-            Log.error("index: " + cellIndex);
-
             String date = CharacterRecognitionHandler.getInstance().doOCR(originalMedicalRecordFile, entryCells.get(cellIndex++)).replace(",", ".").replace(" ", "").trim();
             entryFilled = !date.isEmpty();
             Log.detail(date);
