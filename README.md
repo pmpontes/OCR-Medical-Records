@@ -25,5 +25,8 @@ Useful setup instructions:
 
 ### Usage
 
-* Run the server;
-* Select an image. This image must be at the location specified in MedicalRecordsOCR.FILES_LOCATION.
+The user must run the server, access the Medical Records OCR web page and select a file corresponding to a child's growth table previously scanned. This image must be at the location specified in MedicalRecordsOCR.FILES\_LOCATION and be either a .PNG, .JPG or PDF.
+
+Upon receiving the request, the application proceeds to analyze the image selected. When this process finishes, the data generated will then presented in a table, displayed in a new web page.
+
+It should be noted that, for efficiency purposes, the analysis process halts when a row is signaled as being empty, and the following rows are not processed.
